@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import yfinance, xgboost, lightgbm, torch, statsmodels, pandas, numpy, yaml, tabulate; print\\('all core deps present'\\)\")",
+      "Bash(pip3 show *)",
+      "Read(//usr/local/**)",
+      "Bash(python3 -m venv .venv)",
+      "Bash(.venv/bin/pip install *)",
+      "Bash(.venv/bin/python -c \"import yfinance, xgboost, lightgbm, torch, statsmodels, pandas, numpy, yaml, tabulate, matplotlib, seaborn, sklearn, mysql.connector; print\\('all deps verified'\\)\")",
+      "Bash(brew install *)",
+      "Bash(.venv/bin/python scripts/fetch_data.py)",
+      "Bash(.venv/bin/python benchmarks/run_benchmark.py --skip-heatwave)"
+    ]
+  }
+}

@@ -43,6 +43,8 @@ def fetch_tickers(tickers: list[str], start: str, end: str) -> pd.DataFrame:
         if df.empty:
             log.warning(f"No data returned for {ticker}, skipping.")
             continue
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
         df.columns = [c.lower() for c in df.columns]
         df = df[["open", "high", "low", "close", "volume"]].copy()
         df.index = pd.to_datetime(df.index)

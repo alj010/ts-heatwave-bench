@@ -1,5 +1,8 @@
+import json
 import time
 import logging
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -71,12 +74,27 @@ def _train_eval(rnn_type: str, cfg: dict) -> dict:
     n_runs = cfg["benchmark"]["n_latency_runs"]
     X_train, y_train, X_test, y_test = _prepare(cfg)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    requested = cfg.get("device", "auto")
+    if requested != "auto":
+        device = torch.device(requested)
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
+    log.info(f"  [{rnn_type.upper()}] using device: {device}")
+
+    loss_log_path = Path("results") / f"{rnn_type}_loss.jsonl"
+    loss_log_path.parent.mkdir(exist_ok=True)
+    loss_log_path.write_text("")  # signal that training has started
+
     X_tr = torch.tensor(X_train).to(device)
     y_tr = torch.tensor(y_train).to(device)
     X_te = torch.tensor(X_test).to(device)
 
-    loader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=p["batch_size"], shuffle=True)
+    loader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=p["batch_size"], shuffle=True,
+                        pin_memory=False)
 
     model     = RNNModel(p["hidden_size"], p["num_layers"], p["dropout"]).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=p["learning_rate"])
@@ -84,13 +102,17 @@ def _train_eval(rnn_type: str, cfg: dict) -> dict:
 
     model.train()
     for epoch in range(p["epochs"]):
+        epoch_loss = 0.0
         for xb, yb in loader:
             optimizer.zero_grad()
             loss = criterion(model(xb), yb)
             loss.backward()
             optimizer.step()
-        if (epoch + 1) % 10 == 0:
-            log.info(f"  [{rnn_type.upper()}] epoch {epoch + 1}/{p['epochs']}  loss={loss.item():.6f}")
+            epoch_loss += loss.item()
+        epoch_loss /= len(loader)
+        with loss_log_path.open("a") as f:
+            f.write(json.dumps({"epoch": epoch + 1, "loss": epoch_loss}) + "\n")
+        log.info(f"  [{rnn_type.upper()}] epoch {epoch + 1}/{p['epochs']}  loss={epoch_loss:.6f}")
 
     model.eval()
     latencies = []

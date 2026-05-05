@@ -124,9 +124,12 @@ def main():
                         default=ALL_MODELS, help="Which models to run")
     parser.add_argument("--skip-heatwave", action="store_true",
                         help="Skip HeatWave even if configured")
+    parser.add_argument("--device", choices=["auto", "cpu", "mps", "cuda"], default="auto",
+                        help="Device for PyTorch models (default: auto). Use 'cpu' for background/CI runs.")
     args = parser.parse_args()
 
     cfg = load_config(args.config)
+    cfg["device"] = args.device
     check_data()
 
     log.info(f"Running benchmark for models: {args.models}")
