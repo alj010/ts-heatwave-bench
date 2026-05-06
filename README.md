@@ -16,8 +16,6 @@ This project constructs an end-to-end time series forecasting pipeline and bench
 - XGBoost / LightGBM
 - LSTM / GRU (PyTorch)
 
----
-
 ## Evaluation Metrics
 
 Let $y_i$ be the true value, $\hat{y}_i$ the predicted value, and $n$ the number of samples.
@@ -30,16 +28,12 @@ Let $y_i$ be the true value, $\hat{y}_i$ the predicted value, and $n$ the number
 | Dir. Acc | $\frac{100}{n}\sum_{i=1}^{n}\mathbb{1}[\text{sign}(y_i - y_{i-1}) = \text{sign}(\hat{y}_i - y_{i-1})]$ | higher is better |
 | Latency | $\frac{1}{k}\sum_{j=1}^{k} t_j$ (ms, $k$ inference passes) | lower is better |
 
----
-
 ## Dataset
 
 - **Tickers**: AAPL, MSFT, GOOGL, AMZN, META
 - **Date range**: 2000–2024 (~27k rows)
 - **Features**: OHLCV + rolling returns, SMAs, std, HL spread, volume change (15 features)
 - **Splits**: 70% train / 15% val / 15% test (time-aware, per ticker)
-
----
 
 ## Results
 
@@ -80,8 +74,6 @@ ARIMA produces a near-constant lagged forecast on trending series, which causes 
 
 Both models converge within ~15 epochs. GRU reaches a lower final MSE loss (0.00127 vs 0.00210) and trains more stably, consistent with its lower test MAE.
 
----
-
 ## Stack
 
 - MySQL HeatWave (OCI)
@@ -89,8 +81,6 @@ Both models converge within ~15 epochs. GRU reaches a lower final MSE loss (0.00
 - PyTorch (MPS/CUDA/CPU), XGBoost, LightGBM
 - statsmodels, scikit-learn, yfinance
 - matplotlib, seaborn
-
----
 
 ## Setup
 
@@ -102,8 +92,6 @@ pip install -r requirements.txt
 # macOS (Apple Silicon): install OpenMP for XGBoost/LightGBM
 brew install libomp
 ```
-
----
 
 ## Usage
 
@@ -155,8 +143,6 @@ python scripts/plot_training.py --model lstm
 python scripts/plot_training.py --save assets/training_curves.png  # static export
 ```
 
----
-
 ## HeatWave Setup
 
 MySQL HeatWave is Oracle's in-database ML engine. To benchmark it:
@@ -166,8 +152,6 @@ MySQL HeatWave is Oracle's in-database ML engine. To benchmark it:
 3. Run the benchmark without `--skip-heatwave`
 
 The benchmark automatically loads your data into MySQL, calls `sys.ML_TRAIN()` to train an AutoML forecasting model, and scores it via `sys.ML_PREDICT_ROW()`.
-
----
 
 ## Results Files
 
