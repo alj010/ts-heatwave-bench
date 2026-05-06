@@ -20,41 +20,15 @@ This project constructs an end-to-end time series forecasting pipeline and bench
 
 ## Evaluation Metrics
 
-### Notation
-
 Let $y_i$ be the true value, $\hat{y}_i$ the predicted value, and $n$ the number of samples.
 
-**Mean Absolute Error (MAE)**
-
-$$\text{MAE} = \frac{1}{n} \sum_{i=1}^{n} \left| y_i - \hat{y}_i \right|$$
-
-Lower is better. Measures average absolute deviation in the original price units.
-
-**Root Mean Squared Error (RMSE)**
-
-$$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} \left( y_i - \hat{y}_i \right)^2}$$
-
-Lower is better. Penalizes large errors more heavily than MAE.
-
-**Mean Absolute Percentage Error (MAPE)**
-
-$$\text{MAPE} = \frac{100}{n} \sum_{i=1}^{n} \left| \frac{y_i - \hat{y}_i}{y_i} \right|$$
-
-Lower is better. Scale-independent; sensitive to small denominators (low-price stocks).
-
-**Directional Accuracy**
-
-$$\text{Dir. Acc} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}\!\left[\,\text{sign}(y_i - y_{i-1}) = \text{sign}(\hat{y}_i - y_{i-1})\,\right] \times 100$$
-
-Higher is better. Measures the percentage of correctly predicted up/down moves. 50% = random.
-
-**Inference Latency**
-
-Mean wall-clock time over $k$ repeated inference passes on the full test set:
-
-$$\bar{t} = \frac{1}{k} \sum_{j=1}^{k} t_j$$
-
-Lower is better. Reported in milliseconds.
+| Metric | Formula | Direction |
+|--------|---------|-----------|
+| MAE | $\frac{1}{n}\sum_{i=1}^{n}\|y_i - \hat{y}_i\|$ | lower is better |
+| RMSE | $\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}$ | lower is better |
+| MAPE | $\frac{100}{n}\sum_{i=1}^{n}\left\|\frac{y_i - \hat{y}_i}{y_i}\right\|$ | lower is better |
+| Dir. Acc | $\frac{100}{n}\sum_{i=1}^{n}\mathbb{1}[\text{sign}(y_i - y_{i-1}) = \text{sign}(\hat{y}_i - y_{i-1})]$ | higher is better |
+| Latency | $\frac{1}{k}\sum_{j=1}^{k} t_j$ (ms, $k$ inference passes) | lower is better |
 
 ---
 
